@@ -5,31 +5,6 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 export default function VerifyEmailPage() {
-  const [countdown, setCountdown] = useState(5)
-  const [shouldRedirect, setShouldRedirect] = useState(false)
-  const router = useRouter()
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer)
-          setShouldRedirect(true)
-          return 0
-        }
-        return prev - 1
-      })
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [])
-
-  useEffect(() => {
-    if (shouldRedirect) {
-      router.push('/login')
-    }
-  }, [shouldRedirect, router])
-
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -89,22 +64,13 @@ export default function VerifyEmailPage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="text-sm">
-                <Link
-                  href="/login"
-                  className="font-medium text-indigo-600 hover:text-indigo-500"
-                >
-                  返回登入頁面
-                </Link>
-              </div>
-              <div className="text-sm text-gray-500">
-                {countdown > 0 && (
-                  <span>
-                    {countdown} 秒後自動跳轉...
-                  </span>
-                )}
-              </div>
+            <div className="flex items-center justify-center">
+              <Link
+                href="/login"
+                className="font-medium text-indigo-600 hover:text-indigo-500"
+              >
+                返回登入頁面
+              </Link>
             </div>
           </div>
         </div>
