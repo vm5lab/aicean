@@ -138,13 +138,15 @@ export default function Home() {
                   <div className="space-y-4">
                     <div className="relative aspect-w-16 aspect-h-9 rounded-lg overflow-hidden bg-gray-100">
                       <Image
-                        fill
                         src={prediction.output[prediction.output.length - 1]}
                         alt="生成的圖片"
-                        className="object-cover"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         priority
+                        width={640}
+                        height={640}
                       />
+
+
                     </div>
                     <div className="flex items-center justify-between">
                       <p className="text-sm text-gray-500">
