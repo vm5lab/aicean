@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useTransition } from 'react'
-import { createTodos, toggleTodos, deleteTodos } from './actions'
+import { useEffect } from 'react'
+import { useTodoStore } from './store'
 
 interface Todo {
   id: string
@@ -11,75 +11,22 @@ interface Todo {
 }
 
 export default function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
-  const [todos, setTodos] = useState(initialTodos)
-  const [isPending, startTransition] = useTransition()
-  const [newTodo, setNewTodo] = useState('')
+  const {
+    todos,
+    isPending,
+    newTodo,
+    setNewTodo,
+    setTodos,
+    handleSubmit,
+    handleToggle,
+    handleDelete,
+    handleBatchToggle,
+    handleBatchDelete,
+  } = useTodoStore()
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!newTodo.trim()) return
-
-    const formData = new FormData()
-    formData.append('titles[]', newTodo)
-
-    // 樂觀更新
-    const tempId = `temp-${Date.now()}`
-    setTodos(prev => [{
-      id: tempId,
-      title: newTodo,
-      completed: false,
-      createdAt: new Date(),
-    }, ...prev])
-    setNewTodo('')
-
-    startTransition(async () => {
-      await createTodos(formData)
-    })
-  }
-
-  const handleToggle = async (id: string) => {
-    // 樂觀更新
-    setTodos(prev => prev.map(todo =>
-      todo.id === id ? { ...todo, completed: !todo.completed } : todo
-    ))
-
-    startTransition(async () => {
-      await toggleTodos([id])
-    })
-  }
-
-  const handleDelete = async (id: string) => {
-    // 樂觀更新
-    setTodos(prev => prev.filter(todo => todo.id !== id))
-
-    startTransition(async () => {
-      await deleteTodos([id])
-    })
-  }
-
-  const handleBatchToggle = async (ids: string[]) => {
-    if (!ids.length) return
-
-    // 樂觀更新
-    setTodos(prev => prev.map(todo =>
-      ids.includes(todo.id) ? { ...todo, completed: !todo.completed } : todo
-    ))
-
-    startTransition(async () => {
-      await toggleTodos(ids)
-    })
-  }
-
-  const handleBatchDelete = async (ids: string[]) => {
-    if (!ids.length) return
-
-    // 樂觀更新
-    setTodos(prev => prev.filter(todo => !ids.includes(todo.id)))
-
-    startTransition(async () => {
-      await deleteTodos(ids)
-    })
-  }
+  useEffect(() => {
+    setTodos(initialTodos)
+  }, [initialTodos, setTodos])
 
   return (
     <>
