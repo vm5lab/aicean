@@ -1,132 +1,83 @@
-import { redirect } from 'next/navigation'
-import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
+import AuthProvider from './components/AuthProvider'
+import SignOutButton from './components/SignOutButton'
+import UserProfile from './components/UserProfile'
 
-export default async function DashboardLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/login')
-  }
-
-  const handleSignOut = async () => {
-    'use server'
-    const supabase = await createClient()
-    await supabase.auth.signOut()
-    redirect('/login')
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* 側邊導航 */}
-      <aside className="fixed inset-y-0 left-0 w-64 bg-white border-r border-gray-200">
-        <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="flex items-center h-16 px-4 border-b border-gray-200">
-            <Link href="/dashboard" className="text-2xl font-bold text-indigo-600">
-              Aicean
-            </Link>
-          </div>
-
-          {/* 導航選單 */}
-          <nav className="flex-1 px-4 py-4 space-y-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-50 group"
-              >
-                <span className="w-5 h-5 mr-3 text-gray-400 group-hover:text-indigo-600">
-                  {item.icon}
-                </span>
-                {item.text}
+    <AuthProvider>
+      <div className="min-h-screen bg-gray-50">
+        {/* 側邊導航 */}
+        <aside className="fixed inset-y-0 left-0 w-64 bg-white border-r border-gray-200">
+          <div className="flex flex-col h-full">
+            {/* Logo */}
+            <div className="flex items-center h-16 px-4 border-b border-gray-200">
+              <Link href="/dashboard" className="text-2xl font-bold text-indigo-600">
+                Aicean
               </Link>
-            ))}
-          </nav>
+            </div>
 
-          {/* 用戶資訊 */}
-          <div className="p-4 border-t border-gray-200">
-            <div className="flex items-center">
-              <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
-                <span className="text-sm font-medium text-indigo-600">
-                  {user.email?.[0].toUpperCase()}
-                </span>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-700">{user.email}</p>
+            {/* 導航選單 */}
+            <nav className="flex-1 px-4 py-4 space-y-1">
+              {navItems.map((item) => (
                 <Link
-                  href="/profile"
-                  className="text-xs text-gray-500 hover:text-indigo-600"
+                  key={item.href}
+                  href={item.href}
+                  className="flex items-center px-4 py-2 text-gray-700 rounded-lg hover:bg-gray-50 group"
                 >
-                  查看個人資料
+                  <span className="w-5 h-5 mr-3 text-gray-400 group-hover:text-indigo-600">
+                    {item.icon}
+                  </span>
+                  {item.text}
                 </Link>
+              ))}
+            </nav>
+
+            {/* 用戶資訊 */}
+            <div className="p-4 border-t border-gray-200">
+              <UserProfile />
+            </div>
+          </div>
+        </aside>
+
+        {/* 主要內容區域 */}
+        <div className="pl-64">
+          {/* 頂部導航 */}
+          <header className="h-16 bg-white border-b border-gray-200">
+            <div className="flex items-center justify-between h-full px-6">
+              <h1 className="text-xl font-semibold text-gray-900">儀表板</h1>
+              <div className="flex items-center space-x-4">
+                <button className="p-2 text-gray-400 hover:text-gray-500">
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                    />
+                  </svg>
+                </button>
+                <SignOutButton />
               </div>
             </div>
-          </div>
+          </header>
+
+          {/* 頁面內容 */}
+          <main className="p-6">
+            {children}
+          </main>
         </div>
-      </aside>
-
-      {/* 主要內容區域 */}
-      <div className="pl-64">
-        {/* 頂部導航 */}
-        <header className="h-16 bg-white border-b border-gray-200">
-          <div className="flex items-center justify-between h-full px-6">
-            <h1 className="text-xl font-semibold text-gray-900">儀表板</h1>
-            <div className="flex items-center space-x-4">
-              <button className="p-2 text-gray-400 hover:text-gray-500">
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                  />
-                </svg>
-              </button>
-              <form action={handleSignOut}>
-                <button
-                  type="submit"
-                  className="group relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 transition-all duration-200 ease-in-out hover:text-indigo-600 focus:outline-none"
-                >
-                  <span className="relative z-10 flex items-center">
-                    <svg
-                      className="w-5 h-5 mr-2 transition-transform duration-200 ease-in-out group-hover:translate-x-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                      />
-                    </svg>
-                    登出
-                  </span>
-                  <span className="absolute inset-0 w-full h-full transition-all duration-200 ease-in-out bg-gray-100 rounded-lg opacity-0 group-hover:opacity-100"></span>
-                </button>
-              </form>
-            </div>
-          </div>
-        </header>
-
-        {/* 頁面內容 */}
-        <main className="p-6">
-          {children}
-        </main>
       </div>
-    </div>
+    </AuthProvider>
   )
 }
 
