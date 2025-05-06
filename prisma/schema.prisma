@@ -22,3 +22,14 @@ model Todo {
 
   @@index([userId])
 }
+
+model Image {
+  id        String   @id @default(cuid())
+  userId    String
+  url       String
+  prompt    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+} 
