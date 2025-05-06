@@ -23,8 +23,6 @@ interface TodoStore {
   handleSubmit: (e: React.FormEvent) => Promise<void>
   handleToggle: (id: string) => Promise<void>
   handleDelete: (id: string) => Promise<void>
-  handleBatchToggle: (ids: string[]) => Promise<void>
-  handleBatchDelete: (ids: string[]) => Promise<void>
 }
 
 export const useTodoStore = create<TodoStore>((set, get) => ({
@@ -112,35 +110,4 @@ export const useTodoStore = create<TodoStore>((set, get) => ({
     }
   },
 
-  handleBatchToggle: async (ids) => {
-    if (!ids.length) return
-    const { batchUpdateTodos, setIsPending } = get()
-    const todos = get().todos.filter((t) => ids.includes(t.id))
-    if (!todos.length) return
-
-    // 樂觀更新
-    batchUpdateTodos(ids, !todos[0].completed)
-
-    setIsPending(true)
-    try {
-      await toggleTodos(ids)
-    } finally {
-      setIsPending(false)
-    }
-  },
-
-  handleBatchDelete: async (ids) => {
-    if (!ids.length) return
-    const { batchRemoveTodos, setIsPending } = get()
-
-    // 樂觀更新
-    batchRemoveTodos(ids)
-
-    setIsPending(true)
-    try {
-      await deleteTodos(ids)
-    } finally {
-      setIsPending(false)
-    }
-  },
 })) 

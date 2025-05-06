@@ -20,8 +20,6 @@ export default function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
     handleSubmit,
     handleToggle,
     handleDelete,
-    handleBatchToggle,
-    handleBatchDelete,
   } = useTodoStore()
 
   useEffect(() => {
