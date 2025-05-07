@@ -31,7 +31,7 @@ export default function ScriptList({ scripts }: { scripts: any[] }) {
             <a href={`/dashboard/script/${script.id}`}>
               <h2 className="text-lg font-semibold text-indigo-700 mb-2 truncate">{script.title}</h2>
               <p className="text-gray-500 text-sm mb-2 line-clamp-2">{script.description || '（無描述）'}</p>
-              <div className="text-xs text-gray-400">建立於 {new Date(script.createdAt).toLocaleString()}</div>
+              <div className="text-xs text-gray-400">建立於 {script.createdAtText}</div>
             </a>
             <div className="absolute top-2 right-2 flex gap-2">
               <a
