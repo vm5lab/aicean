@@ -32,4 +32,90 @@ model Image {
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+}
+
+model Script {
+  id          String      @id @default(cuid())
+  title       String
+  description String?
+  content     Json?                   // 腳本內容（可分段落/場景）
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  storyboards Storyboard[]
+  characters  Character[]
+  styles      Style[]
+  videoTasks  VideoTask[]
+}
+
+model Storyboard {
+  id          String      @id @default(cuid())
+  script      Script      @relation(fields: [scriptId], references: [id])
+  scriptId    String
+  title       String
+  description String?
+  order       Int?
+  duration    Int?
+  cameraType  String?
+  notes       String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  characters  Character[] @relation("StoryboardCharacters")
+  style       Style?      @relation(fields: [styleId], references: [id])
+  styleId     String?
+  videoTasks  VideoTask[]
+}
+
+model Character {
+  id          String      @id @default(cuid())
+  script      Script      @relation(fields: [scriptId], references: [id])
+  scriptId    String
+  name        String
+  description String?
+  avatarUrl   String?
+  meta        Json?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  storyboards Storyboard[] @relation("StoryboardCharacters")
+}
+
+model Style {
+  id          String      @id @default(cuid())
+  script      Script      @relation(fields: [scriptId], references: [id])
+  scriptId    String
+  name        String
+  description String?
+  params      Json?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  storyboards Storyboard[]
+}
+
+model VideoTask {
+  id            String      @id @default(cuid())
+  script        Script      @relation(fields: [scriptId], references: [id])
+  scriptId      String
+  storyboard    Storyboard? @relation(fields: [storyboardId], references: [id])
+  storyboardId  String?
+  prompt        String
+  params        Json?
+  model         String
+  apiProvider   String
+  modelVersion  String?
+  status        VideoTaskStatus
+  progress      Int?
+  videoUrl      String?
+  error         String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+enum VideoTaskStatus {
+  pending
+  generating
+  success
+  failed
 } 
