@@ -1,20 +1,37 @@
-"use server"
+'use server'
+import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 
-export async function createScript({ title, description, content }: { title: string, description?: string, content?: string }) {
-  let parsedContent: any = null
-  if (content && content.trim() !== '') {
-    try {
-      parsedContent = JSON.parse(content)
-    } catch {
-      parsedContent = content
-    }
+const scriptSchema = z.object({
+  title: z.string().min(1, '標題必填'),
+  description: z.string().optional(),
+  content: z.any().optional(),
+})
+
+export async function createScript(formData: FormData) {
+  const data = Object.fromEntries(formData)
+  const parsed = scriptSchema.safeParse(data)
+  if (!parsed.success) {
+    return { error: parsed.error.flatten() }
   }
-  await prisma.script.create({
-    data: {
-      title,
-      description,
-      content: parsedContent,
-    },
+  const script = await prisma.script.create({ data: parsed.data })
+  return { script }
+}
+
+export async function updateScript(id: string, formData: FormData) {
+  const data = Object.fromEntries(formData)
+  const parsed = scriptSchema.safeParse(data)
+  if (!parsed.success) {
+    return { error: parsed.error.flatten() }
+  }
+  const script = await prisma.script.update({
+    where: { id },
+    data: parsed.data,
   })
+  return { script }
+}
+
+export async function deleteScript(id: string) {
+  await prisma.script.delete({ where: { id } })
+  return { success: true }
 } 
